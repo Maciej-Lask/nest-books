@@ -6,7 +6,6 @@ import {
   IsUUID,
   Min,
   Max,
-  IsDate,
 } from 'class-validator';
 
 export class CreateBookDTO {
