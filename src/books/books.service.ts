@@ -27,7 +27,6 @@ export class BooksService {
   public async create(
     bookData: Omit<Book, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<Book> {
-
     const authorExists = await this.validateAuthorExists(bookData.authorId);
 
     if (!authorExists) {
@@ -92,8 +91,30 @@ export class BooksService {
 
     if (!existingAuthor) {
       return false;
-    }else{
+    } else {
       return true;
+    }
+  }
+
+  public async like(bookId: string, userId: string) {
+    try {
+      return await this.prismaService.book.update({
+        where: { id: bookId },
+        data: {
+          users: {
+            create: {
+              user: {
+                connect: { id: userId },
+              },
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new BadRequestException('Invalid bookId or userId');
+      }
+      throw error;
     }
   }
 }

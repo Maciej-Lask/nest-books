@@ -9,11 +9,13 @@ import {
   NotFoundException,
   Param,
   ParseUUIDPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { Book } from '@prisma/client';
 import { BooksService } from './books.service';
 import { CreateBookDTO } from './dtos/create-book.dto';
 import { UpdateBookDTO } from './dtos/update-book.dto';
+import { LikeBookDTO } from './dtos/like-book.dto';
 import { UseGuards } from '@nestjs/common/decorators';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
@@ -57,5 +59,13 @@ export class BooksController {
       throw new NotFoundException('Book not found');
     await this.booksService.deleteById(id);
     return { success: true };
+  }
+
+  @Post('/like')
+  @UseGuards(JwtAuthGuard)
+  async like(
+    @Body() likeData: LikeBookDTO,
+  ) {
+    return this.booksService.like(likeData.bookId, likeData.userId);
   }
 }
